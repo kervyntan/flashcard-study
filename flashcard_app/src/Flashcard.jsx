@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import { Card, Text, Button, Title, Input, Group, rem, useMantineTheme, SimpleGrid, Image } from '@mantine/core';
 import { IconUpload, IconPhoto, IconX } from '@tabler/icons-react';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import FileWithPath from 'react-dropzone';
 
 const Flashcard = () => {
@@ -18,6 +20,21 @@ const Flashcard = () => {
     //     />
     //   );
     // })
+    const text = useRef();
+    const submitFlashcard = () => {
+        const dbRef = collection(db, "flashcards");
+        const data = {
+            text : text.current.value
+        }
+        addDoc(dbRef, data)
+        .then( (docRef) => {
+            console.log("Document added successfully.");
+        })
+        .catch( (error) => {
+            console.log(error);
+        })
+    }
+
     return (
         <div className="flashcard">
             <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -69,9 +86,9 @@ const Flashcard = () => {
                 >
                     {previews}
                 </SimpleGrid> */}
-                <Input mt="md" placeholder="Content for flashcard" />
+                <Input mt="md" placeholder="Content for flashcard" ref={text} />
 
-                <Button variant="light" color="blue" fullWidth mt="md" radius="md">
+                <Button variant="light" color="blue" fullWidth mt="md" radius="md" onClick={submitFlashcard}>
                     Create Flashcard!
                 </Button>
             </Card>
