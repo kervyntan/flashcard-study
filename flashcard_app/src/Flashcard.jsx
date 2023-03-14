@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import { Card, Text, Button, Title, Input, Group, rem, useMantineTheme, SimpleGrid, Image } from '@mantine/core';
+import { Card, Text, Button, Title, Input, Group, rem, useMantineTheme, SimpleGrid, Image, Select } from '@mantine/core';
 import { IconUpload, IconPhoto, IconX } from '@tabler/icons-react';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { db } from '../firebase';
@@ -20,19 +20,28 @@ const Flashcard = () => {
     //     />
     //   );
     // })
-    const text = useRef();
+    const topicRef = useRef("");
+    const [topic, setTopic] = useState(topicRef.current.value);
+    const textRef = useRef();
     const submitFlashcard = () => {
         const dbRef = collection(db, "flashcards");
         const data = {
-            text : text.current.value
+            text : textRef.current.value
         }
         addDoc(dbRef, data)
         .then( (docRef) => {
             console.log("Document added successfully.");
+            window.location.reload();
         })
         .catch( (error) => {
             console.log(error);
         })
+    }
+
+    const selectTopic = () => {
+        // console.log(e.target.value);
+        setTopic(topicRef.current.value);
+        console.log(topic);
     }
 
     return (
@@ -43,6 +52,18 @@ const Flashcard = () => {
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, nihil. Nisi at, sunt est vero ipsa fugiat earum quae non?
                 </Text>
 
+                <Select 
+                    label="Topic/Subject"
+                    placeholder="Pick One"
+                    ref={topicRef}
+                    onChange={selectTopic}
+                    data={[
+                        { value : "arrays", label : "Arrays"},
+                        { value : "trees", label : "Trees"},
+                        { value : "sorts", label : "Sorting"},
+                        { value : "data_structures", label : "Data Structures"}
+                    ]}
+                    />
                 <Dropzone
                     onDrop={(files) => console.log('accepted files', files)}
                     onReject={(files) => console.log('rejected files', files)}
@@ -86,7 +107,7 @@ const Flashcard = () => {
                 >
                     {previews}
                 </SimpleGrid> */}
-                <Input mt="md" placeholder="Content for flashcard" ref={text} />
+                <Input mt="md" placeholder="Content for flashcard" ref={textRef} />
 
                 <Button variant="light" color="blue" fullWidth mt="md" radius="md" onClick={submitFlashcard}>
                     Create Flashcard!
